@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
   Mic2,
@@ -42,6 +44,141 @@ const navLinks = [
     icon: HelpCircle,
   },
 ];
+
+// Desktop Auth Component
+function DesktopAuth({ scrolled }: { scrolled: boolean }) {
+  const { isSignedIn, user, isLoaded } = useUser();
+  const router = useRouter();
+
+  const handleSignInClick = () => {
+    if (isSignedIn) {
+      router.push("/dashboard");
+    } else {
+      router.push("/sign-in");
+    }
+  };
+
+  const handleGetStartedClick = () => {
+    if (isSignedIn) {
+      router.push("/dashboard");
+    } else {
+      router.push("/sign-up");
+    }
+  };
+
+  if (isLoaded && isSignedIn && user) {
+    return (
+      <div className="hidden md:flex items-center gap-2.5 flex-shrink-0">
+        <Link href="/dashboard">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`font-medium transition-colors duration-300 ${
+              scrolled
+                ? "text-slate-600 hover:text-slate-900"
+                : "text-slate-300 hover:text-white hover:bg-white/10"
+            }`}
+          >
+            Dashboard
+          </Button>
+        </Link>
+        <img
+          src={user.imageUrl}
+          alt={user.fullName || "User"}
+          className="w-8 h-8 rounded-full ring-2 ring-indigo-500/20 cursor-pointer hover:ring-indigo-500 transition-all"
+          onClick={() => router.push("/dashboard")}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="hidden md:flex items-center gap-2.5 flex-shrink-0">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleSignInClick}
+        className={`font-medium transition-colors duration-300 ${
+          scrolled
+            ? "text-slate-600 hover:text-slate-900"
+            : "text-slate-300 hover:text-white hover:bg-white/10"
+        }`}
+      >
+        Sign in
+      </Button>
+      <Button
+        size="sm"
+        onClick={handleGetStartedClick}
+        className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-md shadow-indigo-500/30 px-4"
+      >
+        Get Started Free
+      </Button>
+    </div>
+  );
+}
+
+// Mobile Auth Component
+function MobileAuth() {
+  const { isSignedIn, user, isLoaded } = useUser();
+  const router = useRouter();
+
+  const handleSignInClick = () => {
+    if (isSignedIn) {
+      router.push("/dashboard");
+    } else {
+      router.push("/sign-in");
+    }
+  };
+
+  const handleGetStartedClick = () => {
+    if (isSignedIn) {
+      router.push("/dashboard");
+    } else {
+      router.push("/sign-up");
+    }
+  };
+
+  if (isLoaded && isSignedIn && user) {
+    return (
+      <div className="flex flex-col gap-2 pt-3 border-t border-slate-100">
+        <Link href="/dashboard" className="w-full">
+          <Button variant="outline" size="sm" className="w-full border-slate-200 text-slate-700">
+            Dashboard
+          </Button>
+        </Link>
+        <div className="flex items-center gap-3 py-2 px-2">
+          <img
+            src={user.imageUrl}
+            alt={user.fullName || "User"}
+            className="w-8 h-8 rounded-full cursor-pointer"
+            onClick={() => router.push("/dashboard")}
+          />
+          <span className="text-sm font-medium text-slate-700">Account</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2 pt-3 border-t border-slate-100">
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full border-slate-200 text-slate-700"
+        onClick={handleSignInClick}
+      >
+        Sign in
+      </Button>
+      <Button
+        size="sm"
+        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold"
+        onClick={handleGetStartedClick}
+      >
+        Get Started Free
+      </Button>
+    </div>
+  );
+}
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -140,25 +277,7 @@ export function Navbar() {
           </nav>
 
           {/* ── Desktop CTAs ──────────────────────────── */}
-          <div className="hidden md:flex items-center gap-2.5 flex-shrink-0">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`font-medium transition-colors duration-300 ${
-                scrolled
-                  ? "text-slate-600 hover:text-slate-900"
-                  : "text-slate-300 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              Sign in
-            </Button>
-            <Button
-              size="sm"
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-md shadow-indigo-500/30 px-4"
-            >
-              Get Started Free
-            </Button>
-          </div>
+          <DesktopAuth scrolled={scrolled} />
 
           {/* ── Mobile Toggle ─────────────────────────── */}
           <button
@@ -209,17 +328,7 @@ export function Navbar() {
             })}
           </nav>
 
-          <div className="flex flex-col gap-2 pt-3 border-t border-slate-100">
-            <Button variant="outline" size="sm" className="w-full border-slate-200 text-slate-700">
-              Sign in
-            </Button>
-            <Button
-              size="sm"
-              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold"
-            >
-              Get Started Free
-            </Button>
-          </div>
+          <MobileAuth />
 
           {/* Mobile social proof */}
           <p className="mt-4 text-center text-xs text-slate-400">
