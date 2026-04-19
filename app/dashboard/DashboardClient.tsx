@@ -9,7 +9,6 @@ import {
   SidebarHeader,
   SidebarContent,
   SidebarFooter,
-  SidebarSeparator,
   SidebarProvider,
   SidebarTrigger,
   SidebarInset,
@@ -17,9 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupContent,
-  SidebarRail,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -82,129 +79,96 @@ export default function DashboardClient({
       <div className="flex min-h-screen w-full bg-background">
         {/* Sidebar */}
         <Sidebar variant="sidebar" collapsible="icon">
-          {/* Sidebar Header */}
-          <SidebarHeader>
-            <div className="flex items-center gap-2 px-2 py-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
-                <Mic2 className="h-4 w-4 text-white" />
+          {/* Header: logo + brand (brand hidden on collapse) */}
+          <SidebarHeader className="border-b border-sidebar-border">
+            <div className="flex h-14 items-center gap-3 px-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600">
+                <Mic2 className="h-6 w-6 text-white" />
               </div>
-              <div className="font-semibold text-lg text-foreground">
+              <span className="font-bold text-base tracking-tight group-data-[collapsible=icon]:hidden">
                 Recruiter<span className="text-indigo-600">AI</span>
-              </div>
+              </span>
             </div>
           </SidebarHeader>
 
-          <SidebarSeparator />
-
-          {/* Navigation Menu */}
-          <SidebarContent>
+          {/* Nav links */}
+          <SidebarContent className="py-2">
             <SidebarGroup>
-              <SidebarGroupLabel>Navigation</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link href="/dashboard" className="flex items-center gap-2">
-                        <Home className="h-4 w-4" />
-                        <span>Home</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link href="/jobs" className="flex items-center gap-2">
-                        <Briefcase className="h-4 w-4" />
-                        <span>Jobs</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link href="/candidates" className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        <span>Candidates</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link href="/interviews" className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>Interviews</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link href="/settings" className="flex items-center gap-2">
-                        <Settings className="h-4 w-4" />
-                        <span>Settings</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                  {[
+                    { href: "/dashboard",  icon: Home,      label: "Home"       },
+                    { href: "/jobs",       icon: Briefcase, label: "Jobs"       },
+                    { href: "/candidates", icon: Users,     label: "Candidates" },
+                    { href: "/interviews", icon: Calendar,  label: "Interviews" },
+                    { href: "/settings",   icon: Settings,  label: "Settings"   },
+                  ].map(({ href, icon: Icon, label }) => (
+                    <SidebarMenuItem key={label}>
+                      <SidebarMenuButton asChild size="lg" tooltip={label}>
+                        <Link href={href}>
+                          <Icon />
+                          <span className="group-data-[collapsible=icon]:hidden">{label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
 
-          <SidebarSeparator />
+          {/* Footer: upgrade + profile */}
+          <SidebarFooter className="border-t border-sidebar-border py-2">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  size="lg"
+                  tooltip="Upgrade Plan"
+                  className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white hover:text-white"
+                >
+                  <Crown />
+                  <span className="group-data-[collapsible=icon]:hidden">Upgrade Plan</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
 
-          {/* Sidebar Footer */}
-          <SidebarFooter>
-            <div className="flex flex-col gap-2 px-2 py-4">
-              {/* Profile Section */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-start gap-2 px-2 py-1.5">
-                    <Avatar className="h-8 w-8">
-                      {imageUrl ? (
-                        <AvatarImage src={imageUrl} alt={displayName} />
-                      ) : (
-                        <AvatarFallback className="bg-indigo-600 text-white">
-                          {(firstName?.[0] ?? email[0]).toUpperCase()}
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-                    <div className="flex flex-col items-start text-left">
-                      <span className="text-sm font-medium">{displayName}</span>
-                      <span className="text-xs text-muted-foreground">{email}</span>
-                    </div>
-                    <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    Profile Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    Account Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => signOut({ redirectUrl: "/" })}
-                    className="text-destructive"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Upgrade Plan Button */}
-              <Button className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-medium">
-                <Crown className="mr-2 h-4 w-4" />
-                Upgrade Plan
-              </Button>
-            </div>
+              <SidebarMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton size="lg" tooltip={displayName}>
+                      <Avatar className="h-7 w-7 shrink-0">
+                        {imageUrl ? (
+                          <AvatarImage src={imageUrl} alt={displayName} />
+                        ) : (
+                          <AvatarFallback className="bg-indigo-600 text-white text-xs">
+                            {(firstName?.[0] ?? email[0]).toUpperCase()}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div className="flex min-w-0 flex-col items-start text-left group-data-[collapsible=icon]:hidden">
+                        <span className="truncate text-sm font-medium">{displayName}</span>
+                        <span className="truncate text-xs text-muted-foreground">{email}</span>
+                      </div>
+                      <ChevronDown className="ml-auto h-4 w-4 shrink-0 text-muted-foreground group-data-[collapsible=icon]:hidden" />
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="top" align="start" className="w-56">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Profile Settings</DropdownMenuItem>
+                    <DropdownMenuItem>Account Settings</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => signOut({ redirectUrl: "/" })}
+                      className="text-destructive"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            </SidebarMenu>
           </SidebarFooter>
-
-          <SidebarRail />
         </Sidebar>
 
         {/* Main Content Area */}
@@ -212,7 +176,7 @@ export default function DashboardClient({
           {/* Top Header */}
           <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="flex h-14 items-center gap-4 px-4">
-              <SidebarTrigger className="md:hidden" />
+              <SidebarTrigger />
               
               <div className="flex-1">
                 <h1 className="text-lg font-semibold">Dashboard</h1>
