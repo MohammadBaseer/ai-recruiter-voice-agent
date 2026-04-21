@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Mic2,
@@ -27,7 +28,7 @@ import {
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
-type PageStep = "loading" | "ready" | "starting" | "started" | "error";
+type PageStep = "loading" | "ready" | "starting" | "error";
 
 interface ErrorMeta {
   reason: "not_found" | "expired" | "completed";
@@ -36,6 +37,7 @@ interface ErrorMeta {
 // ─── Root Client Component ──────────────────────────────────────────────────
 
 export default function InterviewJoinClient({ interviewId }: { interviewId: string }) {
+  const router = useRouter();
   const [step, setStep] = useState<PageStep>("loading");
   const [interview, setInterview] = useState<InterviewData | null>(null);
   const [errorMeta, setErrorMeta] = useState<ErrorMeta | null>(null);
@@ -84,9 +86,9 @@ export default function InterviewJoinClient({ interviewId }: { interviewId: stri
 
     try {
       await startInterviewSession({ interviewId, candidateName: trimmed });
-      setStep("started");
-      // TODO: Initialize session via API, navigate to interview room
-      // router.push(`/interview/${interviewId}/session?name=${encodeURIComponent(trimmed)}`);
+      router.push(
+        `/interview/${interviewId}/session?name=${encodeURIComponent(trimmed)}`
+      );
     } catch {
       setStep("ready");
       setNameError("Something went wrong. Please try again.");
@@ -120,7 +122,6 @@ export default function InterviewJoinClient({ interviewId }: { interviewId: stri
         <div className="w-full max-w-lg">
           {step === "loading" && <LoadingSkeleton />}
           {step === "error" && <ErrorState reason={errorMeta?.reason ?? "not_found"} />}
-          {step === "started" && <SessionStarted fullName={fullName} interview={interview!} />}
           {(step === "ready" || step === "starting") && interview && (
             <InterviewForm
               interview={interview}
@@ -391,29 +392,3 @@ function InterviewForm({
   );
 }
 
-// ─── Session Started (interim state) ───────────────────────────────────────
-
-function SessionStarted({ fullName, interview }: { fullName: string; interview: InterviewData }) {
-  return (
-    <div className="animate-in fade-in-0 zoom-in-95 duration-300">
-      <div className="rounded-2xl border border-border bg-white shadow-sm p-8 text-center space-y-5">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 shadow-lg shadow-indigo-500/30">
-          <Mic2 className="h-8 w-8 text-white" />
-        </div>
-        <div className="space-y-1.5">
-          <h2 className="text-xl font-bold text-foreground">
-            Ready, {fullName.split(" ")[0]}!
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Your session for <span className="font-medium text-foreground">{interview.title}</span>{" "}
-            is initializing. You will be connected shortly.
-          </p>
-        </div>
-        <div className="flex items-center justify-center gap-2 text-sm text-indigo-600 font-medium">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          Connecting to AI interviewer…
-        </div>
-      </div>
-    </div>
-  );
-}

@@ -5,8 +5,15 @@ export interface ICandidate extends Document {
   lastName: string;
   email: string;
   phone?: string;
-  resumeUrl?: string;
+  jobTitle?: string;
+  location?: string;
   linkedInUrl?: string;
+  portfolioUrl?: string;
+  githubUrl?: string;
+  resumeUrl?: string;
+  skills?: string[];
+  experience?: string;
+  education?: string;
   status: 'new' | 'contacted' | 'interviewed' | 'hired' | 'rejected';
   notes?: string;
   createdAt: Date;
@@ -33,29 +40,24 @@ const CandidateSchema: Schema = new Schema(
       trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email'],
     },
-    phone: {
-      type: String,
-      trim: true,
-    },
-    resumeUrl: {
-      type: String,
-    },
-    linkedInUrl: {
-      type: String,
-      trim: true,
-    },
+    phone: { type: String, trim: true },
+    jobTitle: { type: String, trim: true },
+    location: { type: String, trim: true },
+    linkedInUrl: { type: String, trim: true },
+    portfolioUrl: { type: String, trim: true },
+    githubUrl: { type: String, trim: true },
+    resumeUrl: { type: String },
+    skills: [{ type: String, trim: true }],
+    experience: { type: String },
+    education: { type: String },
     status: {
       type: String,
       enum: ['new', 'contacted', 'interviewed', 'hired', 'rejected'],
       default: 'new',
     },
-    notes: {
-      type: String,
-    },
+    notes: { type: String },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true },
 );
 
 const Candidate: Model<ICandidate> =
